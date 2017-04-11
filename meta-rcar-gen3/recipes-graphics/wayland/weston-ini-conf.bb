@@ -1,3 +1,6 @@
+require include/gles-control.inc
+require include/multimedia-control.inc
+
 LICENSE = "MIT"
 
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
