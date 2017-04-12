@@ -1,23 +1,15 @@
 require include/gles-control.inc
 require include/multimedia-control.inc
 
-FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
-SRC_URI = " \
-    file://init \
-    file://weston.service \
-    file://weston-start \
-"
+WESTONARGS ??= "--idle-time=0"
 
 do_install_append() {
-    # Install weston-start script
-    install -Dm755 ${WORKDIR}/weston-start ${D}${bindir}/weston-start
-    sed -i 's,@DATADIR@,${datadir},g' ${D}${bindir}/weston-start
-    sed -i 's,@LOCALSTATEDIR@,${localstatedir},g' ${D}${bindir}/weston-start
+    sed -e 's,launcher="weston-launch.*--",launcher="weston-launch -u root --",g' \
+        -e 's,exec openvt $openvt_args --,exec ,g' \
+        -i ${D}${bindir}/weston-start
 
     if [ "X${USE_GLES}" = "X1" ]; then
-        sed -e "/RequiresMountsFor=\/run/a Wants=rc.pvr.service" \
-            -e "/RequiresMountsFor=\/run/a After=rc.pvr.service" \
-            -e "s/\$OPTARGS/--idle-time=0 \$OPTARGS/" \
+        sed -e "s/\$OPTARGS/${WESTONARGS} \$OPTARGS/" \
             -i ${D}/${systemd_system_unitdir}/weston.service
     fi
 
