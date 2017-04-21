@@ -10,6 +10,7 @@ SRCREV = "db9c64d45818d146200297eaaedbd421a8b59e3a"
 
 SRC_URI += " \
     file://optee.service \
+    file://0001-Honour-the-LDFLAGS-also-in-the-libteec-and-tee-suppl.patch \
 "
 
 inherit systemd

@@ -1,0 +1,47 @@
+From 1d176bf51a0f44a7f71ee05da67508e54b137d3f Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Jan-Simon=20M=C3=B6ller?= <jsmoeller@linuxfoundation.org>
+Date: Fri, 21 Apr 2017 12:45:51 +0200
+Subject: [PATCH] Honour the LDFLAGS also in the libteec and tee-supplicant.
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Fixes:
+ERROR: optee-client-1.1.0+renesas+gitAUTOINC+db9c64d458-r0 do_package_qa:
+QA Issue: No GNU_HASH in the elf binary: /usr/bin/tee-supplicant' [ldflags]
+
+Signed-off-by: Jan-Simon Möller <jsmoeller@linuxfoundation.org>
+---
+ libteec/Makefile        | 2 +-
+ tee-supplicant/Makefile | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/libteec/Makefile b/libteec/Makefile
+index 66055a7..f75c55d 100644
+--- a/libteec/Makefile
++++ b/libteec/Makefile
+@@ -29,7 +29,7 @@ TEEC_CFLAGS	:= $(addprefix -I, $(TEEC_INCLUDES)) $(CFLAGS) -D_GNU_SOURCE \
+ 		   -DDEBUGLEVEL_$(CFG_TEE_CLIENT_LOG_LEVEL) \
+ 		   -DBINARY_PREFIX=\"TEEC\"
+ 
+-TEEC_LFLAGS    := -lpthread
++TEEC_LFLAGS    := -lpthread $(LDFLAGS)
+ TEEC_LIBRARY	:= $(OUT_DIR)/$(LIB_MAJ_MIN)
+ 
+ libteec: $(TEEC_LIBRARY)
+diff --git a/tee-supplicant/Makefile b/tee-supplicant/Makefile
+index 204273f..33bcc58 100644
+--- a/tee-supplicant/Makefile
++++ b/tee-supplicant/Makefile
+@@ -57,7 +57,7 @@ ifeq ($(CFG_TA_TEST_PATH),y)
+ TEES_CFLAGS	+= -DCFG_TA_TEST_PATH=1
+ endif
+ TEES_FILE	:= $(OUT_DIR)/$(PACKAGE_NAME)
+-TEES_LDFLAGS    := -L$(OUT_DIR)/../libteec -lteec
++TEES_LDFLAGS    := -L$(OUT_DIR)/../libteec -lteec $(LDFLAGS)
+ 
+ ifeq ($(CFG_SQL_FS),y)
+ TEES_CFLAGS	+= -DCFG_SQL_FS
+-- 
+2.12.0
+
