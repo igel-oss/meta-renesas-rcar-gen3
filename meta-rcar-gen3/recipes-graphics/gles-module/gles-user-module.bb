@@ -3,6 +3,11 @@ require include/gles-control.inc
 DESCRIPTION = "PowerVR GPU user module"
 LICENSE = "CLOSED"
 
+DEPENDS = " \
+    gles-module-egl-headers \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'wayland', 'libgbm wayland-kms', '', d)} \
+"
+
 PN = "gles-user-module"
 PR = "r0"
 
@@ -16,7 +21,6 @@ SRC_URI_r8a7795 = "file://r8a7795_linux_gsx_binaries_gles3.tar.bz2"
 SRC_URI_r8a7796 = "file://r8a7796_linux_gsx_binaries_gles3.tar.bz2"
 SRC_URI_append = " \
     file://change-shell.patch \
-    file://0001-EGL-eglext.h-Include-eglmesaext.h-to-avoid-compile-error.patch \
     file://rc.pvr.service \
 "
 
@@ -29,9 +33,6 @@ SYSTEMD_SERVICE_${PN} = "rc.pvr.service"
 do_populate_lic[noexec] = "1"
 do_compile[noexec] = "1"
 
-#The headers of gles-user-module need headers from virtual/mesa.
-do_populate_sysroot[depends] += "virtual/mesa:do_populate_sysroot"
-
 do_install() {
     # Install configuration files
     install -d ${D}/${sysconfdir}/init.d
@@ -41,14 +42,10 @@ do_install() {
     install -m 644 ${S}/${sysconfdir}/udev/rules.d/72-pvr-seat.rules ${D}/${sysconfdir}/udev/rules.d/
 
     # Install header files
-    install -d ${D}/${includedir}/EGL
-    install -m 644 ${S}/${includedir}/EGL/*.h ${D}/${includedir}/EGL/
     install -d ${D}/${includedir}/GLES2
     install -m 644 ${S}/${includedir}/GLES2/*.h ${D}/${includedir}/GLES2/
     install -d ${D}/${includedir}/GLES3
     install -m 644 ${S}/${includedir}/GLES3/*.h ${D}/${includedir}/GLES3/
-    install -d ${D}/${includedir}/KHR
-    install -m 644 ${S}/${includedir}/KHR/khrplatform.h ${D}/${includedir}/KHR/khrplatform.h
 
     # Install pre-builded binaries
     install -d ${D}/${libdir}
